@@ -83,6 +83,7 @@ def delete_finger(session, login_url):
         try:
             url = f"{login_url}/api/fingerprint/?page=1&size=1000"
             data = session.get(url=url, verify=True).json()
+            print(f" 此时剩余 {data['total'] }个指纹信息")
             if data['total'] == 0 or len(data['items']) < 1:
                 break
             else:
