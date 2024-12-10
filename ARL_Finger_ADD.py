@@ -142,8 +142,6 @@ def run_thread(fingerprint_msg, session):
         response = session.post(url_add, json=data, verify=False)
         if response.status_code != 200 or response.json()['code'] not in [1609, 1402, 200]:
             print(f"{name} 添加失败 具体需要查看文件下详情 ，此时的错误为：{response.text}")
-        else:
-            print(f"{name} 添加成功")
     except Exception as e:
         print(e)
 
