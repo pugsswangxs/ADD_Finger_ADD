@@ -81,7 +81,7 @@ def delete_finger(session, login_url):
 
     while True:
         try:
-            url = f"{login_url}/api/fingerprint/?page=1&size=500"
+            url = f"{login_url}/api/fingerprint/?page=1&size=1000"
             data = session.get(url=url, verify=True).json()
             if data['total'] == 0 or len(data['items']) < 1:
                 break
@@ -100,9 +100,9 @@ def delete_finger(session, login_url):
 if __name__ == '__main__':
     try:
         if 1 < len(sys.argv) < 5:
-            login_name = sys.argv[1]
-            login_password = sys.argv[2]
-            login_url = sys.argv[3]
+            login_url  = sys.argv[1]
+            login_name  = sys.argv[2]
+            login_password = sys.argv[3]
             session = get_token(login_url, login_name, login_password)
             delete_finger(session, login_url)
         else:
