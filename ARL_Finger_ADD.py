@@ -132,8 +132,6 @@ def run_thread(fingerprint_msg,session):
     data = {"name": name, "human_rule": rule}
     try:
         response = session.post(url_add, json=data, verify=False)
-        if response.status_code == 200:
-            print(''' Add: [\033[32;1m+\033[0m]  {}\n Rsp: [\033[32;1m+\033[0m] {}'''.format(data, response.text))
     except Exception as e:
         print(e)
 
@@ -143,9 +141,10 @@ def main(json_path, session):
     content = f.read()
     load_dict = json.loads(content)
     data = load_dict['fingerprint']
+    print(f"正在添加 {json_path}")
     with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
         list(executor.map(run_thread, data, [session] * len(data)))
-
+    print(f"----------------{json_path} 所有指纹添加成功-------------------")
 
 def add_Finger(name, rule):
     url_add = f"{url}/api/fingerprint/"
