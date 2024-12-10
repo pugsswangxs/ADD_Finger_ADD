@@ -143,7 +143,7 @@ def main(json_path, session):
     content = f.read()
     load_dict = json.loads(content)
     data = load_dict['fingerprint']
-    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
         list(executor.map(run_thread, data, [session] * len(data)))
 
 
@@ -167,7 +167,7 @@ if __name__ == '__main__':
     try:
         json_lists = get_json_name_from_path(json_paths)
         session = get_session(url, login_name, login_password)
-        with concurrent.futures.ProcessPoolExecutor(max_workers=1) as executor:
+        with concurrent.futures.ProcessPoolExecutor(max_workers=5) as executor:
             list(executor.map(main, json_lists, [session] * len(json_lists)))
             executor.shutdown(wait=True)
     except Exception as a:
