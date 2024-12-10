@@ -31,9 +31,3 @@ python3 ARl-Finger-ADD.py https://192.168.1.1:5003/ admin password  xxx/xx/xxx
 ```bash
 python3 ARL-Finger-DELETE.py <login_name> <login_password> <login_url>
 ```
-
-
-确保你已经安装了Python 3，并根据需要安装任何额外的依赖项。通常可以通过pip安装这些依赖：
-
-```bash
-pip install -r requirements.txt
