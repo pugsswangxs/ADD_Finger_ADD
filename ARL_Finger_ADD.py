@@ -139,14 +139,14 @@ def run_thread(fingerprint_msg,session):
 
 
 def main(json_path, session):
+    print(f"正在添加 {json_path}")
     f = open(json_path, 'r', encoding="utf-8")
     content = f.read()
     load_dict = json.loads(content)
     data = load_dict['fingerprint']
-    print(f"正在添加 {json_path}")
-    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
         list(executor.map(run_thread, data, [session] * len(data)))
-    print(f"----------------{json_path} 所有指纹添加成功-------------------")
+    print(f"----------------{json_path} 所有指纹添加成功 共计 {len(data)}个指纹-------------------")
 
 def get_json_name_from_path(file_path):
     '''获取指定文件夹下的 json 文件的路径'''
@@ -157,7 +157,7 @@ if __name__ == '__main__':
     try:
         json_lists = get_json_name_from_path(json_paths)
         session = get_session(url, login_name, login_password)
-        with concurrent.futures.ProcessPoolExecutor(max_workers=2) as executor:
+        with concurrent.futures.ProcessPoolExecutor(max_workers=5) as executor:
             list(executor.map(main, json_lists, [session] * len(json_lists)))
     except Exception as a:
         print(a)
