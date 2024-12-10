@@ -97,13 +97,20 @@ def get_session(login_url, login_name, login_password):
         print(f"Error: {e}")
         sys.exit(1)
 
+def run_thread(fingerprint_msg, session):
+    """
+    处理单个指纹信息并将其添加到系统中。
 
-def run_thread(fingerprint_msg,session):
+    参数:
+    fingerprint_msg (dict): 包含指纹信息的字典。
+    session (requests.Session): 已经登录的会话对象。
+    """
     body = "body=\"{}\""
     title = "title=\"{}\""
     hash = "icon_hash=\"{}\""
 
     finger_json = json.loads(json.dumps(fingerprint_msg))
+    rule = ""
     if finger_json['method'] == "keyword" and finger_json['location'] == "body":
         name = finger_json['cms']
         if len(finger_json['keyword']) > 0:
@@ -127,18 +134,28 @@ def run_thread(fingerprint_msg,session):
                 rule = hash.format(rule)
             else:
                 rule = hash.format(finger_json['keyword'][0])
-
+    if not rule:
+        return
     url_add = f"{url}/api/fingerprint/"
     data = {"name": name, "human_rule": rule}
     try:
         response = session.post(url_add, json=data, verify=False)
-        if response.status_code != 200 or response.json()['code'] not in [1609,1402,200]:
+        if response.status_code != 200 or response.json()['code'] not in [1609, 1402, 200]:
             print(f"{name} 添加失败 具体需要查看文件下详情 ，此时的错误为：{response.text}")
+        else:
+            print(f"{name} 添加成功")
     except Exception as e:
         print(e)
 
 
 def main(json_path, session):
+    """
+    处理指定 JSON 文件中的所有指纹信息并将其添加到系统中。
+
+    参数:
+    json_path (str): 包含指纹信息的 JSON 文件路径。
+    session (requests.Session): 已经登录的会话对象。
+    """
     print(f"正在添加 {json_path}")
     f = open(json_path, 'r', encoding="utf-8")
     content = f.read()
@@ -148,16 +165,22 @@ def main(json_path, session):
         list(executor.map(run_thread, data, [session] * len(data)))
     print(f"----------------{json_path} 所有指纹添加成功 共计 {len(data)}个指纹-------------------")
 
+
 def get_json_name_from_path(file_path):
-    '''获取指定文件夹下的 json 文件的路径'''
+    """
+    获取指定文件夹下的所有 JSON 文件路径。
+
+    参数:
+    file_path (str): 文件夹路径。
+
+    返回:
+    list: 包含所有 JSON 文件路径的列表。
+    """
     return [os.path.join(file_path, file) for file in os.listdir(file_path) if file.endswith('.json')]
 
 
 if __name__ == '__main__':
-    try:
-        json_lists = get_json_name_from_path(json_paths)
-        session = get_session(url, login_name, login_password)
-        with concurrent.futures.ProcessPoolExecutor(max_workers=5) as executor:
-            list(executor.map(main, json_lists, [session] * len(json_lists)))
-    except Exception as a:
-        print(a)
+    json_lists = get_json_name_from_path(json_paths)
+    session = get_session(url, login_name, login_password)
+    with concurrent.futures.ProcessPoolExecutor(max_workers=5) as executor:
+        list(executor.map(main, json_lists, [session] * len(json_lists)))
